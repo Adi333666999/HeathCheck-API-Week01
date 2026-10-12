@@ -1,0 +1,73 @@
+Week 1: HealthCheck API — daily execution plan
+-----------------------------------------------
+Day 1 — Monday
+Build
+
+Goal: Create and run the API locally.
+30–45 minutes
+1. Create a GitHub repository named healthcheck-api.
+2. Create app.py and requirements.txt.
+3. Implement GET /health and GET /version using Flask.
+4. Run the application and test it using curl.
+5. Add a README and commit the code.
+End-of-day achievement: Both endpoints return valid JSON, and the application runs locally.
+------------------------------------------------------------
+Day 2 — Tuesday
+Containerize
+
+Goal: Run Monday's application inside Docker.
+30–45 minutes
+1. Write a Dockerfile.
+2. Build the image using docker build.
+3. Start a container with docker run -p.
+4. Test both endpoints from your host.
+5. Inspect the container using docker ps and docker logs.
+End-of-day achievement: The same API works inside a Docker container. You can explain the image, container and port mapping.
+-----------------------------------------------------------------
+Day 3 — Wednesday
+Networking
+
+Goal: Understand and troubleshoot connectivity.
+30–45 minutes
+1. Test the endpoints using curl -i.
+2. Inspect listening ports using ss -lntp.
+3. Run the container with an incorrect host port mapping.
+4. Diagnose why the request fails and fix it.
+5. Record the symptom, root cause and solution.
+End-of-day achievement: You can explain the path from your host to the application listening inside the container.
+------------------------------------------------------------------
+Day 4 — Thursday
+CI/CD
+
+Goal: Automate testing and image building.
+30–45 minutes
+1. Add a GitHub Actions workflow under .github/workflows/.
+2. Install Python dependencies in the workflow.
+3. Add a basic automated API test.
+4. Build the Docker image when tests pass.
+5. Push a commit and inspect the workflow logs.
+End-of-day achievement: A code push triggers a successful automated test and image build. Publishing to Docker Hub can be included if time allows.
+---------------------------------------------------------------------
+Day 5 — Friday
+Deploy
+
+Goal: Deploy the API to Kubernetes.
+30–45 minutes
+1. Create deployment.yaml.
+2. Create service.yaml.
+3. Deploy using kubectl apply -f.
+4. Check pods and deployments with kubectl get.
+5. Test the API through port-forwarding.
+End-of-day achievement: Kubernetes runs your API, and you can explain how a Deployment manages Pods and how a Service exposes them.
+-----------------------------------------------------------------------------
+Day 6 — Saturday
+Troubleshoot
+
+Goal: Prove that you understand the entire project.
+30–45 minutes
+1. Introduce a bad image tag in a test Deployment.
+2. Diagnose it with kubectl describe pod and kubectl get events.
+3. Restore the correct image and verify recovery.
+4. Review your GitHub commits and README.
+5. Explain the project aloud without reading a tutorial.
+End-of-day achievement: You can identify a deployment failure, correct it and explain the flow from source code to running Pod.
