@@ -23,3 +23,7 @@ jobs:
         python app.py &
         sleep 3
         curl -f http://127.0.0:5000/version
+    - name: Build Docker image
+      run: |
+        docker build -t flask-healthcheck:latest .
+        echo "Docker image built successfully"
