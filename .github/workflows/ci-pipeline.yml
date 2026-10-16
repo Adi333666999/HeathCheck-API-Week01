@@ -3,7 +3,7 @@ name: Simple Flask CI
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: # 👈 This line allows manual triggering
+  workflow_dispatch: 
 
 jobs:
   test-job:
@@ -12,15 +12,12 @@ jobs:
     steps:
     - name: Get code from GitHub
       uses: actions/checkout@v4
-		
     - name: Install Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-
     - name: Install Flask
       run: pip install -r requirements.txt
-
     - name: Verify Health Endpoint
       run: |
         python app.py &
