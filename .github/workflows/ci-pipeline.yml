@@ -1,27 +1,27 @@
 name: Simple Flask CI
 
 on:
-	push:
-		branches: [ "main" ]
+  push:
+    branches: [ "main" ]
 
 jobs:
-	test-job:
-		runs-on: ubuntu-latest
+  test-job:
+    runs-on: ubuntu-latest
 
-	steps:
-		- name: Get code from Github
-		  uses: actions/checkout@v4
+    steps:
+    - name: Get code from GitHub
+      uses: actions/checkout@v4
 		
-		- name: Install Python
-		  uses: actions/setup-python@v5
-			with:
-				python-version: '3.11'
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
 
-		- name: Install Flask
-		  run: pip install -r requirements.txt
+    - name: Install Flask
+      run: pip install -r requirements.txt
 
-	- name: Verify Health Endpoint
-	  run: |
-			python app.py &
-			sleep 3
-			curl -f http://127.0.0
+    - name: Verify Health Endpoint
+      run: |
+        python app.py &
+        sleep 3
+        curl -f http://127.0.0
