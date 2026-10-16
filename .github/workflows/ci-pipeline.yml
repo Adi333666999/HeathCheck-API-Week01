@@ -22,7 +22,7 @@ jobs:
       run: |
         python app.py &
         sleep 3
-        curl -f http://127.0.0:5000/version
+        curl -f http://127.0.1:5000/version
     - name: Build Docker image
       run: |
         docker build -t flask-healthcheck:latest .
