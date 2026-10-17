@@ -1,0 +1,155 @@
+======================================================================
+DEVOPS MINI-PROJECT (WEEK 01) - ARCHITECTURAL TROUBLESHOOTING LOG
+======================================================================
+This document logs the real-world engineering issues, errors, root causes, 
+and resolution pathways encountered during the Week 1 deployment lifecycle.
+
+----------------------------------------------------------------------
+ISSUE #1: Terminal Shell Environment Selection Error
+----------------------------------------------------------------------
+* Symptom/Error Message: 
+  "-sh: python3: not found" AND "-sh: apt-get: not found"
+
+* Root Cause: 
+  The project terminal session accidentally logged directly into Docker Desktop's 
+  internal backend Alpine Linux subsystem distribution workspace instead of the 
+  host environment or a standard user WSL Linux distribution. This minimal 
+  backend has no standard application package managers like apt-get.
+
+* Solution/Resolution:
+  Exited the engine shell backend. Switched development contexts into native 
+  Windows PowerShell and the standard Ubuntu WSL2 distribution to handle 
+  runtime tasks with proper development tools.
+
+----------------------------------------------------------------------
+ISSUE #2: PowerShell Execution Policy Restrictions
+----------------------------------------------------------------------
+* Symptom/Error Message: 
+  "File ...\Activate.ps1 cannot be loaded because running scripts is disabled on this system."
+
+* Root Cause: 
+  Windows PowerShell implements strict execution policy guardrails by default. 
+  It blocks external unverified script configurations (like Python's virtual env 
+  activation wrappers) from launching in standard sessions.
+
+* Solution/Resolution:
+  Executed a scoped policy override command in PowerShell:
+  "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process"
+  This securely enabled script execution constraints strictly for that single 
+  terminal workspace lifecycle.
+
+----------------------------------------------------------------------
+ISSUE #3: Incorrect Remote Git Inbound Routing
+----------------------------------------------------------------------
+* Symptom/Error Message: 
+  "fatal: repository 'https://github.com' not found" AND "error: remote origin already exists."
+
+* Root Cause: 
+  An incomplete URL string ("https://github.com") was accidentally mapped to 
+  the local Git "origin" tracker identifier. When trying to fix it, Git blocked 
+  the command because the name "origin" was already taken by the broken record.
+
+* Solution/Resolution:
+  Overwrote the broken link using the explicit configuration path modifier:
+  "git remote set-url origin https://github.comYourUsername/YourRepoName"
+
+----------------------------------------------------------------------
+ISSUE #4: Stalled Git Payload Timeout During Code Push
+----------------------------------------------------------------------
+* Symptom/Error Message: 
+  "error: RPC failed; HTTP 408 curl 22 ... Writing objects: 51.62 MiB ... fatal: the remote end hung up unexpectedly"
+
+* Root Cause: 
+  The massive virtual environment directory ("venv/") containing local compiled 
+  Python bin libraries was being tracked and uploaded. This created a 51 Megabyte 
+  payload that triggered an HTTP 408 Gateway Timeout on GitHub's ingest firewalls.
+
+* Solution/Resolution:
+  Purged the directory from Git's indexing cache using the following commands:
+  1. "git rm -r --cached venv"
+  2. Created a ".gitignore" file containing "venv/"
+  3. Committed the clean structure and pushed via a lightweight, clean payload.
+
+----------------------------------------------------------------------
+ISSUE #5: GitHub Actions / YAML Structural Syntax Deviations
+----------------------------------------------------------------------
+* Symptom/Error Message: 
+  "Invalid workflow file: You have an error in your yaml syntax on line 4" 
+  AND "strict decoding error: unknown field 'spec.selector.template'"
+
+* Root Cause: 
+  1. Spacing formatting inconsistencies: The workflow file contained an alignment 
+     mismatch under the "push:" blocks.
+  2. Tab/Space Mixture: Secret invisible Tab characters were used instead of literal spaces.
+  3. Parent/Child structural error in Kubernetes: The "template:" block was accidentally 
+     pushed inside the "selector:" hierarchy block instead of standing as a sibling under "spec:".
+
+* Solution/Resolution:
+  Re-aligned all indentations to strict space-only formats, aligning properties 
+  directly under parent key margins according to YAML formatting definitions.
+
+----------------------------------------------------------------------
+ISSUE #6: Incomplete Network Address Binding in Pipeline Test Runs
+----------------------------------------------------------------------
+* Symptom/Error Message: 
+  "curl: (7) Failed to connect to 127.0.0 port 80: Couldn't connect to server"
+
+* Root Cause: 
+  The CI test automation string inside the workflow yaml file was mistyped as 
+  "http://127.0.0". Since it lacked a complete IP string and explicit port allocation, 
+  the runner default-routed requests outward to port 80 instead of checking the 
+  internal background Flask daemon process listening on port 5000.
+
+* Solution/Resolution:
+  Corrected the pipeline testing step block string to declare the complete target:
+  "curl -f http://127.0.0"
+
+----------------------------------------------------------------------
+ISSUE #7: Cluster Core Isolated Registry Image Visibility Gaps
+----------------------------------------------------------------------
+* Symptom/Error Message: 
+  "ErrImageNeverPull" AND "ImagePullBackOff" (Kubelet pulls failed on local nodes)
+
+* Root Cause: 
+  The application image compiled via standard terminal builds existed inside the 
+  WSL workspace cache, but the underlying Kubernetes environment runs an isolated node engine 
+  (desktop-ie0ob7l using a containerd backend) that cannot see standard user namespaces. 
+  Additionally, typos like putting a space in the image name ("flask healthcheck") caused compilation failures.
+
+* Solution/Resolution:
+  1. Rebuilt the image with the correct naming scheme: "docker build -t flask-healthcheck:latest ."
+  2. Configured Docker Desktop's engine settings to bridge the namespace gap by 
+     enabling "Use containerd for storing and pulling images".
+  3. Appended "imagePullPolicy: Never" (or "IfNotPresent") right inside the container 
+     spec rules in deployment.yml to mandate that Kubernetes evaluates the local system registry cache first.
+
+----------------------------------------------------------------------
+ISSUE #8: Kubernetes Unknown Deployment Configuration Fields
+----------------------------------------------------------------------
+* Symptom/Error Message: 
+  "strict decoding error: unknown field 'spec.ports[0].protocols'"
+
+* Root Cause: 
+  A minor grammatical spelling mistake inside "service.yml". The rule was written 
+  with a plural string "protocols:", which is not recognized in the core Kubernetes v1 definitions.
+
+* Solution/Resolution:
+  Changed the definition key block to the singular variant: "protocol: TCP"
+
+----------------------------------------------------------------------
+ISSUE #9: Host to Ingress WSL Bridge Site Reachability Failure
+----------------------------------------------------------------------
+* Symptom/Error Message: 
+  "This site can’t be reached - localhost:30007 actively refused connection"
+
+* Root Cause: 
+  Even though the cluster deployment and NodePort routing rules were correct, 
+  WSL2's virtual network interface blocked port 30007 from being exposed up to 
+  the native host computer's web browsers.
+
+* Solution/Resolution:
+  Created a direct, hardware-level port proxy bridge between the cluster runtime 
+  network layer and the local host laptop network using the following command:
+  "kubectl port-forward service/flask-app-service 30007:80"
+  This successfully exposed the API endpoints to the web browser.
+======================================================================
